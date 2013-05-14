@@ -245,16 +245,16 @@ class Chef
 
     def save
       begin
-        chef_server_rest.put_rest("environments/#{@name}", self)
+        chef_server_rest.put_rest("environments/#{@name}", self, chef_server_rest.idkey)
       rescue Net::HTTPServerException => e
         raise e unless e.response.code == "404"
-        chef_server_rest.post_rest("environments", self)
+        chef_server_rest.post_rest("environments", self, chef_server_rest.idkey)
       end
       self
     end
 
     def create
-      chef_server_rest.post_rest("environments", self)
+      chef_server_rest.post_rest("environments", self, chef_server_rest.idkey)
       self
     end
 

@@ -68,7 +68,7 @@ class Chef
       end
 
       checksums = checksum_files.inject({}){|memo,elt| memo[elt.first]=nil ; memo}
-      new_sandbox = rest.post_rest("sandboxes", { :checksums => checksums })
+      new_sandbox = rest.post_rest("sandboxes", { :checksums => checksums }, rest.idkey)
 
       Chef::Log.info("Uploading files")
 
@@ -97,7 +97,7 @@ class Chef
       # in eventual consistency)
       retries = 0
       begin
-        rest.put_rest(sandbox_url, {:is_completed => true})
+        rest.put_rest(sandbox_url, {:is_completed => true}, rest.idkey)
       rescue Net::HTTPServerException => e
         if e.message =~ /^400/ && (retries += 1) <= 5
           sleep 2
@@ -111,7 +111,7 @@ class Chef
       cookbooks.each do |cb|
         save_url = opts[:force] ? cb.force_save_url : cb.save_url
         begin
-          rest.put_rest(save_url, cb)
+          rest.put_rest(save_url, cb, rest.idkey)
         rescue Net::HTTPServerException => e
           case e.response.code
           when "409"

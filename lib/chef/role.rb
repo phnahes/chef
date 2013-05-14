@@ -211,17 +211,17 @@ class Chef
     # Save this role via the REST API
     def save
       begin
-        chef_server_rest.put_rest("roles/#{@name}", self)
+        chef_server_rest.put_rest("roles/#{@name}", self, chef_server_rest.idkey)
       rescue Net::HTTPServerException => e
         raise e unless e.response.code == "404"
-        chef_server_rest.post_rest("roles", self)
+        chef_server_rest.post_rest("roles", self, chef_server_rest.idkey)
       end
       self
     end
 
     # Create the role via the REST API
     def create
-      chef_server_rest.post_rest("roles", self)
+      chef_server_rest.post_rest("roles", self, chef_server_rest.idkey)
       self
     end
 

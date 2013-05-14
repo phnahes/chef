@@ -72,6 +72,10 @@ class Chef
       handle_options(options)
     end
 
+    def idkey
+      { 'idkey' => Chef::Config[:idkey] }
+    end
+
     def signing_key_filename
       @signing_key_filename
     end
