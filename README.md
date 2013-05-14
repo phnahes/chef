@@ -66,6 +66,50 @@ environment to run the specs--they are completely standalone.
 
     rake spec
 
+## Nginx - VirtualHost
+
+We use this part code on Nginx Virtualhost to force the Gem use. This Gem work with Git.
+
+```
+
+        location / {
+                client_max_body_size 50m;
+                # Block Knife Users
+                #
+                set $stateif "A";
+                if ($request_method = POST) {
+                        set $stateif "${stateif}POST";
+                }
+                if ($request_method = PUT) {
+                        set $stateif "${stateif}PUT";
+                }
+                if ( $http_user_agent ~* "Knife" ){
+                        set $stateif "${stateif}AGENT";
+                }
+                if ( $http_idkey != "123456789ABCDEFG" ){
+                        set $stateif "${stateif}KEY";
+                }
+                if ($stateif = "APOSTAGENT") {
+                        return 401;
+                }
+                if ($stateif = "APUTAGENT") {
+                        return 401;
+                }
+                if ($stateif = "APOSTAGENTKEY") {
+                        return 401;
+                }
+                if ($stateif = "APUTAGENTKEY") {
+                        return 401;
+                }
+
+                proxy_set_header Host $host;
+                proxy_pass http://chef-server-api;
+                proxy_read_timeout 1800s;
+
+        }
+```
+
+
 # License
 
 Chef - A configuration management system
