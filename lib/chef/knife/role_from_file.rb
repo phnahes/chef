@@ -30,11 +30,26 @@ class Chef
 
       banner "knife role from file FILE [FILE..] (options)"
 
+      option :commit,
+        :short => "-m",
+        :long => "--commit MSG",
+        :description => "Git commit message",
+        :default => nil,
+        :required => true
+
       def loader
         @loader ||= Knife::Core::ObjectLoader.new(Chef::Role, ui)
       end
 
       def run
+        # Initialize git and ensure the local repo is synced
+        git = Chef::GitRepo.new(config[:git_log])
+        git.pull
+
+        # push changes before upload
+        git.push_files(name_args, config[:commit], "role")
+
+        # upload role
         @name_args.each do |arg|
           updated = loader.load_from("roles", arg)
 
@@ -49,8 +64,4 @@ class Chef
     end
   end
 end
-
-
-
-
 

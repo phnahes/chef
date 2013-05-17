@@ -48,6 +48,13 @@ class Chef
       :long  => "--all",
       :description => "Upload all data bags or all items for specified data bags"
 
+      option :commit,
+        :short => "-m",
+        :long => "--commit MSG",
+        :description => "Git commit message",
+        :default => nil,
+        :required => true
+
       def read_secret
         if config[:secret]
           config[:secret]
@@ -69,6 +76,13 @@ class Chef
       end
 
       def run
+        # Initialize git and ensure the local repo is synced
+        git = Chef::GitRepo.new(Chef::Config[:git_log])
+        git.pull
+        
+        # push changes before upload
+        git.push_files(@name_args, config[:commit], "data bag")
+
         if config[:all] == true
           load_all_data_bags(@name_args)
         else

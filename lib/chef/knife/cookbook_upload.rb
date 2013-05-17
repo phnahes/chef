@@ -20,6 +20,7 @@
 
 require 'chef/knife'
 require 'chef/cookbook_uploader'
+require 'chef/gitrepo'
 
 class Chef
   class Knife
@@ -68,6 +69,13 @@ class Chef
         :long => "--include-dependencies",
         :description => "Also upload cookbook dependencies"
 
+      option :commit,
+        :short => "-m",
+        :long => "--commit MSG",
+        :description => "Git commit message",
+        :default => nil,
+        :required => true
+
       def run
         # Sanity check before we load anything from the server
         unless config[:all]
@@ -91,6 +99,10 @@ class Chef
         upload_failures = 0
         upload_ok = 0
 
+        # Initialize git and ensure the local repo is synced
+        git = Chef::GitRepo.new(config[:git_log])
+        git.pull
+
         # Get a list of cookbooks and their versions from the server
         # to check for the existence of a cookbook's dependencies.
         @server_side_cookbooks = Chef::CookbookVersion.list_all_versions
@@ -104,6 +116,7 @@ class Chef
             version_constraints_to_update[cookbook_name] = cookbook.version
           end
           begin
+            git.push_cookbooks(cookbook_repo, config[:commit])
             upload(cbs, justify_width)
           rescue Exceptions::CookbookFrozen
             ui.warn("Not updating version constraints for some cookbooks in the environment as the cookbook is frozen.")
@@ -116,6 +129,7 @@ class Chef
             exit 1
           end
 
+          git.push_cookbooks(cookbooks_to_upload, config[:commit])
           cookbooks_to_upload.each do |cookbook_name, cookbook|
             cookbook.freeze_version if config[:freeze]
             begin

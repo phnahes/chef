@@ -25,12 +25,21 @@ class Chef
         require 'chef/knife/core/object_loader'
       end
 
+      attr_accessor :git
+
       banner "knife environment from file FILE [FILE..] (options)"
 
       option :all,
       :short => "-a",
       :long  => "--all",
       :description => "Upload all environments"
+
+      option :commit,
+        :short => "-m",
+        :long => "--commit MSG",
+        :description => "Git commit message",
+        :default => nil,
+        :required => true
 
       def loader
         @loader ||= Knife::Core::ObjectLoader.new(Chef::Environment, ui)
@@ -50,6 +59,11 @@ class Chef
           ui.fatal("Unable to find any environment files in '#{environments_path}'")
           exit(1)
         end
+
+        # push changes before upload
+        git.push_files(environments, config[:commit], "environment")
+
+        # upload environments
         environments.each do |env|
           load_environment(env)
         end
@@ -62,8 +76,11 @@ class Chef
         ui.info("Updated Environment #{updated.name}")
       end
 
-        
       def run
+        # Initialize git and ensure the local repo is synced
+        @git = Chef::GitRepo.new(config[:git_log])
+        git.pull
+
         if config[:all] == true
           load_all_environments
         else
@@ -73,6 +90,10 @@ class Chef
             exit 1
           end
   
+          # push changes before upload
+          git.push_files(@name_args, config[:commit], "environment")
+
+          # upload environments
           @name_args.each do |arg|
             load_environment(arg)
           end
