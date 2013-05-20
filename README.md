@@ -68,7 +68,7 @@ environment to run the specs--they are completely standalone.
 
 ## Knife Configurations
 
-I needed insert these lines below on your knife.rb.
+Is needed insert these lines below on your knife.rb.
 
 ```
 	chef_server_url          'http://chef.domain.com.br/'
