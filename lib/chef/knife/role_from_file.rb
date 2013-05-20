@@ -43,7 +43,7 @@ class Chef
 
       def run
         # Initialize git and ensure the local repo is synced
-        git = Chef::GitRepo.new(config[:git_log])
+        git = Chef::GitRepo.new(Chef::Config[:git_log])
         git.pull
 
         # push changes before upload

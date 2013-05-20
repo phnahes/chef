@@ -100,7 +100,7 @@ class Chef
         upload_ok = 0
 
         # Initialize git and ensure the local repo is synced
-        git = Chef::GitRepo.new(config[:git_log])
+        git = Chef::GitRepo.new(Chef::Config[:git_log])
         git.pull
 
         # Get a list of cookbooks and their versions from the server
