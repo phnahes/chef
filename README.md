@@ -66,6 +66,17 @@ environment to run the specs--they are completely standalone.
 
     rake spec
 
+## Knife Configurations
+
+I needed insert these lines below on your knife.rb.
+
+```
+	chef_server_url          'http://chef.domain.com.br/'
+	idkey                    'dbb7b294e78f1c47d4a10d160442fb6a276ea0eedd9ca7c7206731f29257b511' 
+	git_repo                 '/home/user/chef-repo' 
+	git_log                  '/tmp/chef/git.log'
+```
+
 ## Nginx - VirtualHost
 
 We use this part code on Nginx Virtualhost to force the Gem use. This Gem work with Git.

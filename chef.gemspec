@@ -19,6 +19,8 @@ Gem::Specification.new do |s|
   s.add_dependency "mixlib-shellout"
   s.add_dependency "ohai", ">= 0.6.0"
 
+  s.add_dependency "git", ">= 1.2.5"
+
   s.add_dependency "rest-client", ">= 1.0.4", "< 1.7.0"
 
   # The JSON gem reliably releases breaking changes as a patch release
