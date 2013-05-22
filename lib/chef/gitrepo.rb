@@ -53,6 +53,7 @@ class Chef
       end
       
       @git = Git.open(Chef::Config[:git_repo], :log => logger)
+      
     end
 
     # Sync local repo with remote
@@ -66,11 +67,13 @@ class Chef
     # - commit_msg Commit message
     def push_cookbooks(cbs, commit_msg)
       ui.info("Applying your repository changes")
-      cbs.each do |cbname, cb|
-        ui.info("- cookbook #{cbname} ")
-        git.add("cookbooks/#{cbname}")
+      Dir.chdir(Chef::Config[:git_repo]) do
+        cbs.each do |cbname, cb|
+          ui.info("- cookbook #{cbname} ")
+          git.add("cookbooks/#{cbname}")
+        end
+        push(commit_msg)
       end
-      push(commit_msg)
     end
 
     # Send list of files to remote repo
@@ -80,11 +83,13 @@ class Chef
     # - type A string of the file type to send (role,environment or data bag)
     def push_files(files, commit_msg, type)
       ui.info("Applying your repository changes")
-      files.each do |file|
-        ui.info("- #{type} #{file} ")
-        git.add("#{file}")
+      Dir.chdir(Chef::Config[:git_repo]) do
+        files.each do |file|
+          ui.info("- #{type} #{file} ")
+          git.add("#{file}")
+        end
+        push(commit_msg)
       end
-      push(commit_msg)
     end
 
     private
