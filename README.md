@@ -82,8 +82,8 @@ Is needed insert these lines below on your knife.rb.
 We use this part code on Nginx Virtualhost to force the Gem use. This Gem work with Git.
 
 ```
-
-        location / {
+      
+                location / {
                 client_max_body_size 50m;
                 # Block Knife Users
                 #
@@ -94,10 +94,10 @@ We use this part code on Nginx Virtualhost to force the Gem use. This Gem work w
                 if ($request_method = PUT) {
                         set $stateif "${stateif}PUT";
                 }
-                if ( $http_user_agent ~* "Knife" ){
+                if ( $http_user_agent !~ "(Knife|Ruby)" ){
                         set $stateif "${stateif}AGENT";
                 }
-                if ( $http_idkey != "123456789ABCDEFG" ){
+                if ( $http_idkey != "dbb7b294e78f1c47d4a10d160442fb6a276ea0eedd9ca7c7206731f29257b511" ){
                         set $stateif "${stateif}KEY";
                 }
                 if ($stateif = "APOSTAGENT") {
@@ -118,6 +118,9 @@ We use this part code on Nginx Virtualhost to force the Gem use. This Gem work w
                 proxy_read_timeout 1800s;
 
         }
+
+}
+
 ```
 
 
