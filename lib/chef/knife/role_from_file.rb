@@ -47,7 +47,7 @@ class Chef
         git.pull
 
         # push changes before upload
-        git.push_files(name_args, config[:commit], "role")
+        git.push_files(name_args, config[:commit], "rl")
 
         # upload role
         @name_args.each do |arg|

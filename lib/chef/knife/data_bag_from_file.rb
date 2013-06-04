@@ -80,10 +80,11 @@ class Chef
         git = Chef::GitRepo.new(Chef::Config[:git_log])
         git.pull
         
-        # push changes before upload
-        git.push_files(@name_args, config[:commit], "data bag")
 
         if config[:all] == true
+          # push changes before upload
+          git.push_files(@name_args, config[:commit], "db")
+          
           load_all_data_bags(@name_args)
         else
           if @name_args.size < 2
@@ -91,6 +92,10 @@ class Chef
             exit(1)
           end
           @data_bag = @name_args.shift
+
+          # push changes before upload
+          git.push_files(@name_args, config[:commit], "db")
+          
           load_data_bag_items(@data_bag, @name_args)
         end
       end

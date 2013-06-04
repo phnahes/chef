@@ -67,12 +67,19 @@ class Chef
     # - commit_msg Commit message
     def push_cookbooks(cbs, commit_msg)
       ui.info("Applying your repository changes")
+      commit_prefix = "cb:"
+      first_add = true
       Dir.chdir(Chef::Config[:git_repo]) do
         cbs.each do |cbname, cb|
           ui.info("- cookbook #{cbname} ")
           git.add("cookbooks/#{cbname}")
+          if(!first_add)
+            commit_prefix += ","
+          end
+          first_add = false
+          commit_prefix += "#{cbname}"
         end
-        push(commit_msg)
+        push(commit_prefix, commit_msg)
       end
     end
 
@@ -80,26 +87,43 @@ class Chef
     # This is used by from files subcommands
     # - files Array of files to sent
     # - commit_msg Commit message
-    # - type A string of the file type to send (role,environment or data bag)
-    def push_files(files, commit_msg, type)
+    # - prefix A string of the file prefix code (rl for roles, en for environments or db for data bags)
+    def push_files(files, commit_msg, prefix)
       ui.info("Applying your repository changes")
-      Dir.chdir(Chef::Config[:git_repo]) do
-        files.each do |file|
-          ui.info("- #{type} #{file} ")
-          git.add("#{file}")
+      commit_prefix = "#{prefix}:"
+      first_add = true
+      files.each do |file|
+        file_path = File.expand_path(file)
+        if prefix == "db"
+          file_name = file_path.split('/').last(3).join('/')
+        else
+          file_name = file_path.split('/').last(2).join('/')
         end
-        push(commit_msg)
+        Dir.chdir(Chef::Config[:git_repo]) do
+          if(!first_add)
+            commit_prefix += ","
+          end
+          first_add = false
+          commit_prefix += file_name.split('/').last
+          ui.info("- #{file_name}")
+          git.add("#{file_name}")
+        end
+      end
+      Dir.chdir(Chef::Config[:git_repo]) do
+        push(commit_prefix, commit_msg)
       end
     end
 
     private
 
     # commit and push the modifications
+    # - commit_prefix What must be commited
     # - commit_msg Commit message
-    def push(commit_msg)
+    def push(commit_prefix, commit_msg)
       begin
-        ui.info("Committing with message: #{commit_msg}")
-        git.commit(commit_msg)
+        msg = "[#{commit_prefix}] #{commit_msg}"
+        ui.info("Committing with message: #{msg}")
+        git.commit(msg)
         ui.info("Pushing changes")
         git.push()
       rescue Git::GitExecuteError => e

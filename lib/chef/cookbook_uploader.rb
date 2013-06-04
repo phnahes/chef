@@ -144,7 +144,7 @@ class Chef
                                                                            :timestamp   => timestamp,
                                                                            :user_id     => rest.client_name
                                                                            )
-        headers = { 'content-type' => 'application/x-binary', 'content-md5' => checksum64, :accept => 'application/json' }
+        headers = { 'content-type' => 'application/x-binary', 'content-md5' => checksum64, :accept => 'application/json', 'idkey' => Chef::Config[:idkey] }
         headers.merge!(sign_obj.sign(OpenSSL::PKey::RSA.new(rest.signing_key)))
 
         begin

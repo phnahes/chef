@@ -91,7 +91,7 @@ class Chef
           end
   
           # push changes before upload
-          git.push_files(@name_args, config[:commit], "environment")
+          git.push_files(@name_args, config[:commit], "en")
 
           # upload environments
           @name_args.each do |arg|
