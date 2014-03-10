@@ -53,7 +53,7 @@ class Chef
         :long => "--commit MSG",
         :description => "Git commit message",
         :default => nil,
-        :required => true
+        :required => false
 
       def read_secret
         if config[:secret]
@@ -80,6 +80,13 @@ class Chef
         git = Chef::GitRepo.new(Chef::Config[:git_log])
         git.pull
         
+        # Check size of commit message 
+        if config.has_key? :commit
+                if config[:commit].nil? || config[:commit].empty?
+                        ui.msg("You must suply commit message: '-m' <message> ")
+                        exit(1)
+                end
+        end
 
         if config[:all] == true
           # push changes before upload
